@@ -1,7 +1,7 @@
 <p align="center">
   <img
     width="100%"
-    src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,100:2563EB&height=180&section=header&text=Chirudeva%20Reddy&fontSize=42&fontColor=F8FAFC&animation=fadeIn&fontAlignY=35&desc=AI%20Engineer%20%7C%20Health%2C%20Fitness%20%26%20Useful%20Systems&descAlignY=58&descSize=16"
+    src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,100:2563EB&height=180&section=header&text=Chirudeva%20Reddy&fontSize=42&fontColor=F8FAFC&animation=fadeIn&fontAlignY=35&desc=AI%20Engineer%20%7C%20Health%2C%20Fitness%20%26amp%3B%20Useful%20Systems&descAlignY=58&descSize=16"
     alt="Chirudeva Reddy; AI engineer building useful systems across health and fitness"
   />
 </p>
