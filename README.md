@@ -86,6 +86,12 @@ An end-to-end machine learning and geospatial analytics pipeline for severity pr
   />
 </p>
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake.svg" />
+  <img alt="Chirudeva Reddy's GitHub contribution snake" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake.svg" />
+</picture>
+
 ## Let’s build something useful
 
 I’m open to AI engineering roles and collaborations in applied ML, trustworthy AI, health tech, and fitness tech. If your problem is difficult, practical, and slightly stubborn, we’ll probably get along.
