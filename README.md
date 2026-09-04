@@ -1,30 +1,33 @@
 <p align="center">
-  <img
-    width="100%"
-    src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,100:2563EB&height=180&section=header&text=Chirudeva%20Reddy&fontSize=42&fontColor=F8FAFC&animation=fadeIn&fontAlignY=35&desc=AI%20Engineer%20%7C%20Health%2C%20Fitness%20%26amp%3B%20Useful%20Systems&descAlignY=58&descSize=16"
-    alt="Chirudeva Reddy; AI engineer building useful systems across health and fitness"
-  />
-</p>
-
-<p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=21&duration=3200&pause=900&color=58A6FF&center=true&vCenter=true&width=780&height=55&lines=AI+engineer%2C+mostly+health+and+fitness;The+model+is+usually+the+easy+part;I+care+about+the+eval%2C+not+just+the+demo;Currently+living+in+RAG+evaluation+and+computer+vision" />
-    <source media="(prefers-color-scheme: light)" srcset="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=21&duration=3200&pause=900&color=2563EB&center=true&vCenter=true&width=780&height=55&lines=AI+engineer%2C+mostly+health+and+fitness;The+model+is+usually+the+easy+part;I+care+about+the+eval%2C+not+just+the+demo;Currently+living+in+RAG+evaluation+and+computer+vision" />
-    <img src="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=21&duration=3200&pause=900&color=2563EB&center=true&vCenter=true&width=780&height=55&lines=AI+engineer%2C+mostly+health+and+fitness;The+model+is+usually+the+easy+part;I+care+about+the+eval%2C+not+just+the+demo;Currently+living+in+RAG+evaluation+and+computer+vision" alt="AI engineer, mostly health and fitness. The model is usually the easy part. I care about the eval, not just the demo. Currently living in RAG evaluation and computer vision." />
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/banner-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/banner.svg" />
+    <img width="100%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/banner.svg" alt="Chirudeva Reddy, AI engineer working on health, fitness and useful systems" />
   </picture>
 </p>
 
 <p align="center">
   <a href="https://www.linkedin.com/in/chirudeva-reddy/">
-    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="Connect with Chirudeva Reddy on LinkedIn" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-linkedin-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-linkedin.svg" />
+      <img src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-linkedin.svg" alt="Connect with Chirudeva Reddy on LinkedIn" />
+    </picture>
   </a>
   <a href="mailto:chirudevareddy03@gmail.com">
-    <img src="https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white" alt="Email Chirudeva Reddy" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-email-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-email.svg" />
+      <img src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-email.svg" alt="Email Chirudeva Reddy" />
+    </picture>
   </a>
   <a href="https://www.instagram.com/chiru.reddyy/">
-    <img src="https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Follow Chirudeva Reddy on Instagram" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-instagram-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-instagram.svg" />
+      <img src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/social-instagram.svg" alt="Follow Chirudeva Reddy on Instagram" />
+    </picture>
   </a>
-  <img src="https://komarev.com/ghpvc/?username=Chirudeva-Reddy&style=flat-square&color=2563EB&label=Profile+views" alt="Profile view counter" />
 </p>
 
 ## About me
@@ -87,57 +90,21 @@ An end-to-end ML and geospatial pipeline. DBSCAN finds the hotspots, SHAP explai
 
 <br />
 
-**AI and machine learning**
-
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
-![CUDA](https://img.shields.io/badge/CUDA-76B900?style=flat-square&logo=nvidia&logoColor=white)
-![MLflow](https://img.shields.io/badge/MLflow-0194E2?style=flat-square&logo=mlflow&logoColor=white)
-
-**Data and applications**
-
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
-![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=flat-square&logo=plotly&logoColor=white)
-![Django](https://img.shields.io/badge/Django-092E20?style=flat-square&logo=django&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
-
-**Platforms**
-
-![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonwebservices&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-DD2C00?style=flat-square&logo=firebase&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/stack-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/stack.svg" />
+  <img width="100%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/stack.svg" alt="Python, PyTorch, TensorFlow, scikit-learn, CUDA, MLflow, NumPy, Pandas, Streamlit, Plotly, Django, Node.js, PostgreSQL, MongoDB, AWS, Azure, Firebase and Vercel" />
+</picture>
 
 </details>
 
 ## GitHub activity
 
-<p align="center">
-  <img
-    height="165"
-    src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=Chirudeva-Reddy&theme=github_dark"
-    alt="Chirudeva Reddy's GitHub statistics"
-  />
-  <img
-    height="165"
-    src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=Chirudeva-Reddy&theme=github_dark"
-    alt="Languages used across Chirudeva Reddy's public GitHub repositories"
-  />
-</p>
-
-<p align="center">
-  <img
-    height="165"
-    src="https://streak-stats.demolab.com/?user=Chirudeva-Reddy&theme=github-dark-blue&hide_border=true&date_format=j%20M%5B%20Y%5D"
-    alt="Chirudeva Reddy's GitHub contribution streak"
-  />
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/activity-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/activity.svg" />
+  <img width="100%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/activity.svg" alt="Contribution totals, streaks and top languages for Chirudeva Reddy" />
+</picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake-dark.svg" />
@@ -158,7 +125,7 @@ An end-to-end ML and geospatial pipeline. DBSCAN finds the hotspots, SHAP explai
   </picture>
 </p>
 
-Generated by [Platane/snk](https://github.com/Platane/snk) in [.github/workflows/snake.yml](.github/workflows/snake.yml).
+Everything on this page is generated by [.github/workflows/snake.yml](.github/workflows/snake.yml) and committed to the `output` branch: the snake by [Platane/snk](https://github.com/Platane/snk), the rest by [tools/build_assets.py](tools/build_assets.py). No third-party image service is contacted when you load this page.
 
 </details>
 
@@ -170,16 +137,8 @@ I am open to AI engineering roles and to collaborating on applied ML, trustworth
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=17&duration=3800&pause=1000&color=8B949E&center=true&vCenter=true&width=620&height=45&lines=Thanks+for+scrolling+this+far;Open+to+AI+engineering+roles;Hard%2C+practical+problems+welcome;chirudevareddy03%40gmail.com" />
-    <source media="(prefers-color-scheme: light)" srcset="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=17&duration=3800&pause=1000&color=64748B&center=true&vCenter=true&width=620&height=45&lines=Thanks+for+scrolling+this+far;Open+to+AI+engineering+roles;Hard%2C+practical+problems+welcome;chirudevareddy03%40gmail.com" />
-    <img src="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=17&duration=3800&pause=1000&color=64748B&center=true&vCenter=true&width=620&height=45&lines=Thanks+for+scrolling+this+far;Open+to+AI+engineering+roles;Hard%2C+practical+problems+welcome;chirudevareddy03%40gmail.com" alt="Thanks for scrolling this far. Open to AI engineering roles. Hard, practical problems welcome. chirudevareddy03@gmail.com" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/footer-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/footer.svg" />
+    <img width="100%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/footer.svg" alt="Open to AI engineering roles. Hard, practical problems welcome. chirudevareddy03@gmail.com" />
   </picture>
-</p>
-
-<p align="center">
-  <img
-    width="100%"
-    src="https://capsule-render.vercel.app/api?type=waving&color=0:2563EB,100:0F172A&height=140&section=footer"
-    alt=""
-  />
 </p>
