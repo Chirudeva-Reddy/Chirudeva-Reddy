@@ -263,6 +263,35 @@ def test_hevy_import():
     print("hevy import ok")
 
 
+def test_week_window_labels_follow_the_constant():
+    """The window length appears in a metric label and an axis label. Both
+    must derive from TRAINING_WEEKS, or changing it leaves the card claiming
+    a range it no longer plots."""
+    original = b.TRAINING_WEEKS
+    try:
+        for weeks in (16, 26, 8):
+            b.TRAINING_WEEKS = weeks
+            doc = b.build_training(b.THEMES[""],
+                                   [(date(2026, 9, 1), 60), (date(2026, 8, 25), 45)],
+                                   today=date(2026, 9, 4))
+            assert "Minutes, %d weeks" % weeks in doc, \
+                "metric label did not follow the constant at %d" % weeks
+            assert "%d weeks ago" % weeks in doc, \
+                "axis label did not follow the constant at %d" % weeks
+            others = {26, 16, 8} - {weeks}
+            for stale in others:
+                assert "%d weeks" % stale not in doc, \
+                    "found stale '%d weeks' while set to %d" % (stale, weeks)
+            assert len(b.weekly_minutes([])) == weeks, \
+                "weekly_minutes ignored the constant when called bare"
+            pts = re.search(r'points="([^"]+)"', doc).group(1).split(" ")
+            assert len(pts) == weeks, "plotted %d points for a %d week window" % (
+                len(pts), weeks)
+    finally:
+        b.TRAINING_WEEKS = original
+    print("week window labels ok")
+
+
 def test_assets_are_wellformed_svg():
     """Every builder must emit parseable XML; a stray & would blank the image."""
     stats = {"total": 1126, "commits": 409, "stars": 10, "prs": 68, "issues": 3,
@@ -293,5 +322,6 @@ if __name__ == "__main__":
     test_sparkline_stays_inside_its_box()
     test_training_card_empty_state_invents_nothing()
     test_hevy_import()
+    test_week_window_labels_follow_the_constant()
     test_assets_are_wellformed_svg()
     print("OK")

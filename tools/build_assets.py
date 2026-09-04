@@ -466,7 +466,7 @@ def build_social(p, label, color):
 
 
 TRAINING_CSV = os.environ.get("TRAINING_CSV", "data/training.csv")
-TRAINING_WEEKS = 26
+TRAINING_WEEKS = 16
 
 
 def load_training(path=None):
@@ -498,8 +498,13 @@ def week_start(day):
     return day - timedelta(days=day.weekday())
 
 
-def weekly_minutes(sessions, weeks=TRAINING_WEEKS, today=None):
-    """Total minutes per week, oldest first, ending with the current week."""
+def weekly_minutes(sessions, weeks=None, today=None):
+    """Total minutes per week, oldest first, ending with the current week.
+
+    weeks resolves at call time, not as a default argument: a default would
+    freeze TRAINING_WEEKS at import and quietly ignore a later change.
+    """
+    weeks = weeks or TRAINING_WEEKS
     today = today or date.today()
     end = week_start(today)
     first = end - timedelta(weeks=weeks - 1)
@@ -571,7 +576,8 @@ def build_training(p, sessions, today=None):
     cells = [(len(recent), "Sessions, 12 months", True),
              (week_streak(sessions, today), "Week streak", True),
              ("{} min".format(avg), "Average session", False),
-             ("{:,}".format(sum(weeks)), "Minutes, 26 weeks", False)]
+             ("{:,}".format(sum(weeks)),
+              "Minutes, {} weeks".format(TRAINING_WEEKS), False)]
     step = w / len(cells)
     for i, (value, label, hot) in enumerate(cells):
         body.append(metric(step * (i + 0.5), 78, value, label, p, accent=hot))
