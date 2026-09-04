@@ -66,6 +66,39 @@ def test_typing_keytimes():
     print("typing keyTimes ok (%d animations)" % checked)
 
 
+def test_only_one_typing_line_is_visible_at_a_time():
+    """Each line's group is opaque only during its own slot. Without this the
+    idle lines leave their carets parked on screen next to the active line."""
+    lines = ["one", "line two", "the third line"]
+    frag = b.typing(lines, 200, 40, 18, "#000", "#111")
+    root = ET.fromstring("<svg xmlns='http://www.w3.org/2000/svg'>"
+                         + frag.replace("xml:space", "space") + "</svg>")
+    groups = [g for g in root.iter() if g.tag.endswith("}g")]
+    assert len(groups) == len(lines), "expected one gated group per line"
+
+    windows = []
+    for g in groups:
+        assert g.attrib.get("opacity") == "0", "group must start hidden"
+        gate = next(a for a in g if a.tag.endswith("animate")
+                    and a.attrib.get("calcMode") == "discrete")
+        kt = [float(v) for v in gate.attrib["keyTimes"].split(";")]
+        vals = [int(v) for v in gate.attrib["values"].split(";")]
+        assert len(kt) == len(vals)
+        assert kt[0] == 0 and kt[-1] == 1
+        assert all(x <= y for x, y in zip(kt, kt[1:])), kt
+        on = [(kt[i], kt[i + 1]) for i in range(len(vals) - 1) if vals[i] == 1]
+        assert len(on) == 1, "a line should be visible in exactly one window"
+        windows.append(on[0])
+
+    windows.sort()
+    for (_, prev_end), (next_start, _) in zip(windows, windows[1:]):
+        assert prev_end <= next_start + 1e-9, \
+            "visible windows overlap: %s" % (windows,)
+    assert abs(windows[0][0]) < 1e-9, "first window should open the loop"
+    assert abs(windows[-1][1] - 1) < 1e-9, "last window should close the loop"
+    print("typing gating ok (%d non-overlapping windows)" % len(windows))
+
+
 def test_chip_text_stays_inside_its_pill():
     """The pill is drawn at a width computed from the label, and the label is
     pinned with textLength. Both must agree, or the text spills out of the
@@ -131,6 +164,7 @@ def test_assets_are_wellformed_svg():
 
 if __name__ == "__main__":
     test_streaks()
+    test_only_one_typing_line_is_visible_at_a_time()
     test_chip_text_stays_inside_its_pill()
     test_language_legend_stays_in_card()
     test_typing_keytimes()

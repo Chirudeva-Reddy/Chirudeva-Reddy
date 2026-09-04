@@ -238,11 +238,26 @@ def typing(lines, center_x, y, size, color, cursor_color, hold=2600, per_char=55
         t1 = typed / total
         t2 = (typed + hold) / total
         t3 = mine / total
-        begin = start / total
+        begin = round(start / total, 5)
         kt = [0, begin, begin + t1, begin + t2, begin + t3, 1]
         kt = [min(1, max(0, round(v, 5))) for v in kt]
         vals = [0, 0, width, width, 0, 0]
+
+        # Every line owns a caret, and all of them animate at once, so without
+        # a gate the idle lines park their carets on screen and the banner
+        # shows a row of stray bars beside whichever line is typing. The group
+        # is opaque only during this line's slot; the caret blink multiplies
+        # against it, so a hidden group hides its caret too.
+        end = min(1.0, round((start + mine) / total, 5))
+        if begin <= 0:
+            gate_kt, gate_v = [0, end, 1], [1, 0, 0]
+        else:
+            gate_kt, gate_v = [0, begin, end, 1], [0, 1, 0, 0]
+
         out.append(
+            '<g opacity="0">'
+            '<animate attributeName="opacity" calcMode="discrete" dur="{dur}ms" '
+            'repeatCount="indefinite" keyTimes="{gkt}" values="{gv}"/>'
             '<clipPath id="clip{i}"><rect x="{x}" y="{yy}" height="{h}">'
             '<animate attributeName="width" dur="{dur}ms" repeatCount="indefinite" '
             'calcMode="linear" keyTimes="{kt}" values="{vals}"/></rect></clipPath>'
@@ -256,9 +271,12 @@ def typing(lines, center_x, y, size, color, cursor_color, hold=2600, per_char=55
             '<animate attributeName="x" dur="{dur}ms" repeatCount="indefinite" '
             'calcMode="linear" keyTimes="{kt}" values="{cx}"/>'
             '<animate attributeName="opacity" dur="900ms" repeatCount="indefinite" '
-            'values="1;1;0;0;1" keyTimes="0;0.4;0.5;0.9;1"/></rect>'.format(
+            'values="1;1;0;0;1" keyTimes="0;0.4;0.5;0.9;1"/></rect>'
+            '</g>'.format(
                 i=i, x=x, y=y, yy=y - size * 0.82, h=size * 1.12,
                 dur=total, kt=";".join(str(v) for v in kt),
+                gkt=";".join(str(v) for v in gate_kt),
+                gv=";".join(str(v) for v in gate_v),
                 vals=";".join(str(round(v, 2)) for v in vals),
                 cx=";".join(str(round(x + v, 2)) for v in vals),
                 ff=MONO, s=size, c=color, cc=cursor_color, t=esc(text),
