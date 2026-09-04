@@ -7,6 +7,7 @@ Run: python3 tools/test_build_assets.py
 
 import os
 import sys
+import re
 import xml.etree.ElementTree as ET
 from datetime import date, timedelta
 
@@ -143,6 +144,76 @@ def test_language_legend_stays_in_card():
     print("legend clipping ok")
 
 
+def test_training_parsing_and_bucketing():
+    import tempfile
+    monday = date(2026, 8, 31)          # a Monday
+    csv_text = ("# comment line, must be ignored\n"
+                "date,minutes\n"
+                "2026-08-31,60\n"
+                "2026-09-02,45\n"
+                "2026-08-24,30\n"
+                "not-a-date,60\n"      # skipped, not fatal
+                "2026-08-25,\n"         # blank minutes, skipped
+                "2026-08-26,0\n")      # zero, skipped
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as fh:
+        fh.write(csv_text)
+        path = fh.name
+    rows = b.load_training(path)
+    assert [m for _, m in rows] == [30, 60, 45], rows
+    assert rows == sorted(rows), "rows must come back in date order"
+    assert b.load_training(path + ".missing") == [], "missing file must be empty"
+
+    weeks = b.weekly_minutes(rows, weeks=3, today=date(2026, 9, 4))
+    assert weeks == [0, 30, 105], weeks   # 60+45 land in the same week
+    print("training parsing ok")
+
+
+def test_week_streak():
+    def sess(*mondays):
+        return [(date(2026, 8, d), 60) for d in mondays]
+    today = date(2026, 9, 4)              # Friday of the w/c 31 Aug week
+    assert b.week_streak([], today) == 0
+    # Trained this week and the two before it.
+    assert b.week_streak(sess(31, 24, 17), today) == 3
+    # Nothing yet this week: the run through last week must survive.
+    assert b.week_streak(sess(24, 17), today) == 2
+    # A missed week genuinely breaks it.
+    assert b.week_streak(sess(24, 10), today) == 1
+    print("week streak ok")
+
+
+def test_sparkline_stays_inside_its_box():
+    """Points are placed by hand, so a tall week must not draw above the box
+    or past its right edge."""
+    x, y, w, h = 26, 116, 848, 62
+    vals = [0, 5, 200, 3, 0, 87]
+    frag = b.sparkline(x, y, w, h, vals, "#000", "#000")
+    poly = re.search(r'points="([^"]+)"', frag).group(1)
+    pts = [tuple(float(n) for n in p.split(",")) for p in poly.split(" ")]
+    assert len(pts) == len(vals)
+    for px, py in pts:
+        assert x - 0.01 <= px <= x + w + 0.01, "x out of box: %s" % px
+        assert y - 0.01 <= py <= y + h + 0.01, "y out of box: %s" % py
+    assert abs(pts[0][0] - x) < 0.01 and abs(pts[-1][0] - (x + w)) < 0.01
+    assert abs(pts[2][1] - y) < 0.01, "the peak should touch the top"
+    assert b.sparkline(x, y, w, h, [0, 0, 0], "#000", "#000") == "", \
+        "all-zero data should draw nothing rather than a flat fake line"
+    assert b.sparkline(x, y, w, h, [5], "#000", "#000") == "", \
+        "a single point cannot form a line"
+    print("sparkline bounds ok")
+
+
+def test_training_card_empty_state_invents_nothing():
+    doc = b.build_training(b.THEMES[""], [])
+    ET.fromstring(doc)
+    assert "No sessions logged yet" in doc
+    assert not re.search(r'<(polyline|circle)', doc), \
+        "empty log must not draw a chart"
+    assert not re.search(r'font-size="26"', doc), \
+        "empty log must not show headline numbers"
+    print("training empty state ok")
+
+
 def test_assets_are_wellformed_svg():
     """Every builder must emit parseable XML; a stray & would blank the image."""
     stats = {"total": 1126, "commits": 409, "stars": 10, "prs": 68, "issues": 3,
@@ -168,5 +239,9 @@ if __name__ == "__main__":
     test_chip_text_stays_inside_its_pill()
     test_language_legend_stays_in_card()
     test_typing_keytimes()
+    test_training_parsing_and_bucketing()
+    test_week_streak()
+    test_sparkline_stays_inside_its_box()
+    test_training_card_empty_state_invents_nothing()
     test_assets_are_wellformed_svg()
     print("OK")

@@ -9,6 +9,7 @@ branch, so a dead third-party service can never blank the profile.
 Stdlib only. Needs GITHUB_TOKEN in the environment for the GraphQL calls.
 """
 
+import csv
 import json
 import os
 import sys
@@ -464,6 +465,127 @@ def build_social(p, label, color):
     return svg(round(w + 2, 2), 30, frag, label)
 
 
+TRAINING_CSV = os.environ.get("TRAINING_CSV", "data/training.csv")
+TRAINING_WEEKS = 26
+
+
+def load_training(path=None):
+    """Read the training log: 'date,minutes', one row per session.
+
+    A hand-kept CSV rather than Strava or Hevy, because both need an OAuth
+    token per reader and this file needs nothing at all. Bad rows are skipped
+    instead of failing the build, so a half-pasted export still renders.
+    """
+    path = path or TRAINING_CSV
+    if not os.path.exists(path):
+        return []
+    rows = []
+    with open(path, newline="", encoding="utf-8") as fh:
+        body = [ln for ln in fh if not ln.lstrip().startswith("#")]
+    for row in csv.DictReader(body):
+        try:
+            day = datetime.strptime((row.get("date") or "").strip()[:10],
+                                    "%Y-%m-%d").date()
+            minutes = int(float(row.get("minutes") or 0))
+        except (ValueError, TypeError):
+            continue
+        if minutes > 0:
+            rows.append((day, minutes))
+    return sorted(rows)
+
+
+def week_start(day):
+    return day - timedelta(days=day.weekday())
+
+
+def weekly_minutes(sessions, weeks=TRAINING_WEEKS, today=None):
+    """Total minutes per week, oldest first, ending with the current week."""
+    today = today or date.today()
+    end = week_start(today)
+    first = end - timedelta(weeks=weeks - 1)
+    buckets = [0] * weeks
+    for day, minutes in sessions:
+        start = week_start(day)
+        if first <= start <= end:
+            buckets[(start - first).days // 7] += minutes
+    return buckets
+
+
+def week_streak(sessions, today=None):
+    """Consecutive trained weeks. The current week counts only once it has a
+    session, so a quiet Monday does not appear to end the run."""
+    today = today or date.today()
+    trained = {week_start(d) for d, _ in sessions}
+    cursor = week_start(today)
+    if cursor not in trained:
+        cursor -= timedelta(weeks=1)
+    streak = 0
+    while cursor in trained:
+        streak += 1
+        cursor -= timedelta(weeks=1)
+    return streak
+
+
+def sparkline(x, y, w, h, values, stroke, fill):
+    """Filled area plus line. Y is scaled to the peak, so the shape reads as
+    relative effort rather than implying an absolute scale."""
+    if len(values) < 2 or not any(values):
+        return ""
+    peak = max(values)
+    step = w / (len(values) - 1)
+    pts = [(x + i * step, y + h - (v / peak) * h) for i, v in enumerate(values)]
+    line = " ".join("{},{}".format(round(px, 2), round(py, 2)) for px, py in pts)
+    area = ("M{},{} L".format(round(x, 2), round(y + h, 2)) + line
+            + " L{},{} Z".format(round(x + w, 2), round(y + h, 2)))
+    last_x, last_y = pts[-1]
+    return ('<path d="{a}" fill="{f}" opacity="0.18"/>'
+            '<polyline points="{l}" fill="none" stroke="{s}" stroke-width="2" '
+            'stroke-linejoin="round" stroke-linecap="round"/>'
+            '<circle cx="{cx}" cy="{cy}" r="3.5" fill="{s}"/>'.format(
+                a=area, l=line, s=stroke, f=fill,
+                cx=round(last_x, 2), cy=round(last_y, 2)))
+
+
+def build_training(p, sessions, today=None):
+    today = today or date.today()
+    w, h = 900, 210
+    body = ['<rect x="0.5" y="0.5" width="{}" height="{}" rx="12" fill="{}" '
+            'stroke="{}"/>'.format(w - 1, h - 1, p["surface"], p["line"])]
+    body.append('<text x="26" y="34" font-family="{ff}" font-size="13" '
+                'font-weight="700" letter-spacing="0.08em" fill="{c}">'
+                'TRAINING LOG</text>'.format(ff=SANS, c=p["muted"]))
+
+    if not sessions:
+        # Honest empty state. Inventing sessions would put fabricated numbers
+        # on a public profile, so the card says there is nothing logged yet.
+        body.append('<text x="{x}" y="112" font-family="{ff}" font-size="14" '
+                    'fill="{c}" text-anchor="middle">No sessions logged yet. '
+                    'Add rows to data/training.csv and this fills in.</text>'
+                    .format(x=w / 2, ff=SANS, c=p["muted"]))
+        return svg(w, h, "".join(body), "Training log, no sessions recorded yet")
+
+    weeks = weekly_minutes(sessions, TRAINING_WEEKS, today)
+    year_ago = today - timedelta(days=365)
+    recent = [(d, m) for d, m in sessions if d >= year_ago]
+    avg = round(sum(m for _, m in recent) / len(recent)) if recent else 0
+    cells = [(len(recent), "Sessions, 12 months", True),
+             (week_streak(sessions, today), "Week streak", True),
+             ("{} min".format(avg), "Average session", False),
+             ("{:,}".format(sum(weeks)), "Minutes, 26 weeks", False)]
+    step = w / len(cells)
+    for i, (value, label, hot) in enumerate(cells):
+        body.append(metric(step * (i + 0.5), 78, value, label, p, accent=hot))
+
+    body.append(sparkline(26, 116, w - 52, 62, weeks,
+                          p["accent"], p["accent"]))
+    body.append('<text x="26" y="196" font-family="{ff}" font-size="10.5" '
+                'fill="{c}">{n} weeks ago</text>'
+                '<text x="{r}" y="196" font-family="{ff}" font-size="10.5" '
+                'fill="{c}" text-anchor="end">this week</text>'.format(
+                    ff=SANS, c=p["muted"], n=TRAINING_WEEKS, r=w - 26))
+    return svg(w, h, "".join(body), "Weekly training minutes")
+
+
 def write(name, content):
     path = os.path.join(OUT, name)
     with open(path, "w", encoding="utf-8") as fh:
@@ -483,10 +605,14 @@ def main():
               file=sys.stderr)
         stats = None
 
+    sessions = load_training()
+    print("training sessions loaded: {}".format(len(sessions)))
+
     for suffix, palette in THEMES.items():
         write("banner{}.svg".format(suffix), build_banner(palette))
         write("footer{}.svg".format(suffix), build_footer(palette))
         write("stack{}.svg".format(suffix), build_stack(palette))
+        write("training{}.svg".format(suffix), build_training(palette, sessions))
         for slug, label, color in SOCIAL:
             write("social-{}{}.svg".format(slug, suffix),
                   build_social(palette, label, color))

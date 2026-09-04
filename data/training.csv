@@ -1,0 +1,5 @@
+# Training log. One row per session; the profile sparkline reads this file.
+# Columns: date (YYYY-MM-DD), minutes (integer)
+# Lines starting with # are ignored, so paste a Hevy or Strava export under
+# the header and delete any columns you do not want.
+date,minutes
