@@ -7,6 +7,13 @@
 </p>
 
 <p align="center">
+  <img
+    src="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=21&duration=3200&pause=900&color=2563EB&center=true&vCenter=true&width=780&height=55&lines=AI+engineer%2C+mostly+health+and+fitness;The+model+is+usually+the+easy+part;I+care+about+the+eval%2C+not+just+the+demo;Currently+living+in+RAG+evaluation+and+computer+vision"
+    alt="AI engineer, mostly health and fitness. The model is usually the easy part. I care about the eval, not just the demo. Currently living in RAG evaluation and computer vision."
+  />
+</p>
+
+<p align="center">
   <a href="https://www.linkedin.com/in/chirudeva-reddy/">
     <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="Connect with Chirudeva Reddy on LinkedIn" />
   </a>
@@ -16,33 +23,68 @@
   <a href="https://www.instagram.com/chiru.reddyy/">
     <img src="https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Follow Chirudeva Reddy on Instagram" />
   </a>
+  <img src="https://komarev.com/ghpvc/?username=Chirudeva-Reddy&style=flat-square&color=2563EB&label=Profile+views" alt="Profile view counter" />
 </p>
 
 ## About me
 
-I’m Chirudeva Reddy; I build AI systems for practical, stubborn problems. I happen to enjoy problems that refuse to cooperate, which is convenient because AI provides those in bulk.
+I build AI systems for problems that don't cooperate. Most of that work lands in machine learning applied to health and fitness, which happens to be what I spend my own time on too.
 
-My strongest interests sit at the intersection of machine learning, health, and fitness. I care about the model, but I also care about the data, the evaluation, the failure modes, and whether the result is still useful after the demo ends.
+The model is usually the easy part. I spend more time on the data, the evaluation, and the ways a pipeline fails quietly, because that is what decides whether something still works a month after the demo.
 
-Training keeps my head clear; debugging keeps me humble. Both have taught me the same lesson: consistency beats heroic bursts, and skipped fundamentals usually collect interest later.
+I lift most days. That is where the fitness half comes from, and it taught me to stop skipping the boring fundamentals, in the gym and in a codebase.
 
-Right now, I’m deepening my foundations in machine learning, RAG evaluation, computer vision, and production AI. I’m looking for an AI engineering role where I can learn fast, own difficult problems, and contribute from day one.
+Right now I am working through ML fundamentals, RAG evaluation, computer vision, and what it takes to run AI in production. I am looking for an AI engineering role.
 
 ## Featured work
 
-### [Body2Health](https://github.com/Chirudeva-Reddy/body2health)
+<sub>Click a project to open it up.</sub>
 
-Privacy-conscious, dual-view silhouette anthropometry for estimating measurable body dimensions and deriving health indices. The pipeline combines YOLO and SAM2 preprocessing, a dual-view model, and an SMPL-X reliability gate that rejects weak predictions instead of quietly pretending they are fine.
+<details>
+<summary><b>Body2Health</b> · body measurements from two silhouette photos, plus the health indices you can derive from them</summary>
 
-### [Pre-generation Hallucination Detection](https://github.com/Chirudeva-Reddy/NLP-Proj)
+<br />
 
-A research pipeline for identifying RAG hallucination risk from transformer hidden-state dynamics before hallucinated tokens are emitted. It combines five internal drift signals with causal activation patching and cross-domain evaluation.
+It works from silhouettes rather than identifiable photos, which is the privacy-conscious part. YOLO and SAM2 handle preprocessing, a dual-view model does the estimation, and an SMPL-X reliability gate rejects weak predictions instead of quietly reporting a number anyway.
 
-### [Road Accident Severity Prediction](https://github.com/Chirudeva-Reddy/Road-Accident-Severity-Prediction)
+`YOLO` `SAM2` `SMPL-X` `PyTorch` `Computer vision`
 
-An end-to-end machine learning and geospatial analytics pipeline for severity prediction and crash-hotspot mapping. It uses DBSCAN, SHAP, Plotly, Folium, and Dash across large NSW and Chicago datasets.
+[Open the repository](https://github.com/Chirudeva-Reddy/body2health)
+
+</details>
+
+<details>
+<summary><b>Pre-generation hallucination detection</b> · catching RAG hallucinations before the model emits them</summary>
+
+<br />
+
+A research pipeline that reads hallucination risk out of transformer hidden-state dynamics, before any hallucinated token is generated. Five internal drift signals, causal activation patching to check the signals are actually causal, and evaluation across domains.
+
+`Transformers` `RAG` `Activation patching` `Interpretability`
+
+[Open the repository](https://github.com/Chirudeva-Reddy/NLP-Proj)
+
+</details>
+
+<details>
+<summary><b>Road accident severity prediction</b> · severity models and crash-hotspot maps over NSW and Chicago data</summary>
+
+<br />
+
+An end-to-end ML and geospatial pipeline. DBSCAN finds the hotspots, SHAP explains what the model is keying on, and Plotly, Folium and Dash carry the results into something you can actually click around in.
+
+`DBSCAN` `SHAP` `Plotly` `Folium` `Dash`
+
+[Open the repository](https://github.com/Chirudeva-Reddy/Road-Accident-Severity-Prediction)
+
+</details>
 
 ## Tools I use
+
+<details open>
+<summary><b>The stack</b></summary>
+
+<br />
 
 **AI and machine learning**
 
@@ -71,6 +113,8 @@ An end-to-end machine learning and geospatial analytics pipeline for severity pr
 ![Firebase](https://img.shields.io/badge/Firebase-DD2C00?style=flat-square&logo=firebase&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
 
+</details>
+
 ## GitHub activity
 
 <p align="center">
@@ -86,14 +130,53 @@ An end-to-end machine learning and geospatial analytics pipeline for severity pr
   />
 </p>
 
+<p align="center">
+  <img
+    height="165"
+    src="https://streak-stats.demolab.com/?user=Chirudeva-Reddy&theme=github-dark-blue&hide_border=true&date_format=j%20M%5B%20Y%5D"
+    alt="Chirudeva Reddy's GitHub contribution streak"
+  />
+</p>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake.svg" />
   <img alt="Chirudeva Reddy's GitHub contribution snake" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/github-snake.svg" />
 </picture>
 
-## Let’s build something useful
+<details>
+<summary>The snake eats my commit squares once a day. Here it is underwater.</summary>
 
-I’m open to AI engineering roles and collaborations in applied ML, trustworthy AI, health tech, and fitness tech. If your problem is difficult, practical, and slightly stubborn, we’ll probably get along.
+<br />
+
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/ocean.gif"
+    alt="Ocean-themed animation of the GitHub contribution snake"
+  />
+</p>
+
+Generated by [Platane/snk](https://github.com/Platane/snk) in [.github/workflows/snake.yml](.github/workflows/snake.yml).
+
+</details>
+
+## Let's build something useful
+
+I am open to AI engineering roles and to collaborating on applied ML, trustworthy AI, health tech, and fitness tech. If you have a hard, practical problem, send it over.
 
 **[Email me](mailto:chirudevareddy03@gmail.com)** or **[connect with me on LinkedIn](https://www.linkedin.com/in/chirudeva-reddy/)**.
+
+<p align="center">
+  <img
+    src="https://readme-typing-svg.demolab.com/?font=JetBrains+Mono&weight=500&size=17&duration=3800&pause=1000&color=64748B&center=true&vCenter=true&width=620&height=45&lines=Thanks+for+scrolling+this+far;Open+to+AI+engineering+roles;Hard%2C+practical+problems+welcome;chirudevareddy03%40gmail.com"
+    alt="Thanks for scrolling this far. Open to AI engineering roles. Hard, practical problems welcome. chirudevareddy03@gmail.com"
+  />
+</p>
+
+<p align="center">
+  <img
+    width="100%"
+    src="https://capsule-render.vercel.app/api?type=waving&color=0:2563EB,100:0F172A&height=140&section=footer"
+    alt=""
+  />
+</p>
