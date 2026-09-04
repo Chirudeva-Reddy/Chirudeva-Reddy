@@ -13,6 +13,7 @@ from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_assets as b
+import import_hevy as ih
 
 
 def days_from(spec, end=None):
@@ -214,6 +215,54 @@ def test_training_card_empty_state_invents_nothing():
     print("training empty state ok")
 
 
+def test_hevy_import():
+    """The importer collapses set rows into sessions and refuses to invent or
+    silently keep nonsense durations."""
+    import tempfile, io, contextlib
+    src = (
+        'title,start_time,end_time,exercise_title,weight_kg,reps\n'
+        # three sets, one session, 40 minutes
+        '"Upper-A","Sep 2, 2026, 6:59 PM","Sep 2, 2026, 7:39 PM","Pushdown",50,10\n'
+        '"Upper-A","Sep 2, 2026, 6:59 PM","Sep 2, 2026, 7:39 PM","Pushdown",54,8\n'
+        '"Upper-A","Sep 2, 2026, 6:59 PM","Sep 2, 2026, 7:39 PM","Curl",30,10\n'
+        # a separate 45 minute session on another day
+        '"Lower-A","Sep 4, 2026, 9:00 AM","Sep 4, 2026, 9:45 AM","Squat",100,5\n'
+        # timer never stopped: must be dropped, not counted
+        '"Ghost","Sep 5, 2026, 8:00 PM","Sep 6, 2026, 9:00 AM","Bench",60,5\n'
+        # zero length: must be dropped
+        '"Zero","Sep 6, 2026, 8:00 PM","Sep 6, 2026, 8:00 PM","Bench",60,5\n'
+        # unreadable stamp: skipped without killing the run
+        '"Bad","not a date","also not a date","Bench",60,5\n')
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as fh:
+        fh.write(src); path = fh.name
+    sessions, skipped, dropped = ih.read_sessions(path)
+    assert sessions == [(date(2026, 9, 2), 40), (date(2026, 9, 4), 45)], sessions
+    assert len(skipped) == 1, skipped
+    assert len(dropped) == 2, dropped
+
+    # A non-Hevy csv must fail loudly rather than writing an empty log.
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as fh:
+        fh.write("a,b\n1,2\n"); wrong = fh.name
+    try:
+        ih.read_sessions(wrong)
+        raise AssertionError("expected a SystemExit on a non-Hevy file")
+    except SystemExit as exc:
+        assert "missing column" in str(exc), exc
+
+    # Round trip: what the importer writes, the renderer must read back.
+    out = tempfile.mktemp(suffix=".csv")
+    with contextlib.redirect_stdout(io.StringIO()):
+        ih.main([path, "--out", out])
+    assert b.load_training(out) == sessions, "importer output must reload"
+
+    # --dry-run must not create the file.
+    ghost = tempfile.mktemp(suffix=".csv")
+    with contextlib.redirect_stdout(io.StringIO()):
+        ih.main([path, "--out", ghost, "--dry-run"])
+    assert not os.path.exists(ghost), "dry run wrote a file"
+    print("hevy import ok")
+
+
 def test_assets_are_wellformed_svg():
     """Every builder must emit parseable XML; a stray & would blank the image."""
     stats = {"total": 1126, "commits": 409, "stars": 10, "prs": 68, "issues": 3,
@@ -243,5 +292,6 @@ if __name__ == "__main__":
     test_week_streak()
     test_sparkline_stays_inside_its_box()
     test_training_card_empty_state_invents_nothing()
+    test_hevy_import()
     test_assets_are_wellformed_svg()
     print("OK")
