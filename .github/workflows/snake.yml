@@ -18,7 +18,18 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v7
-      # Step 2: Generate the snake animations
+      # Step 2: Render the banner, stack, activity and footer SVGs.
+      # This runs before snk so that dist/ is created by the runner user:
+      # snk is a Docker action running as root, and a root-owned dist/ is not
+      # writable by this step.
+      - name: Build Profile Assets
+        run: |
+          python3 tools/test_build_assets.py
+          python3 tools/build_assets.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUT_DIR: dist
+      # Step 3: Generate the snake animations into the same directory
       - name: Generate GitHub Contributions Snake Animations
         uses: Platane/snk@v3
         with:
@@ -32,14 +43,6 @@ jobs:
             dist/ocean-dark.svg?color_snake=orange&color_dots=#0b1b3a,#1e3a8a,#2563eb,#3b82f6,#93c5fd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Step 3: Render the banner, stack, activity and footer SVGs
-      - name: Build Profile Assets
-        run: |
-          python3 tools/test_build_assets.py
-          python3 tools/build_assets.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OUT_DIR: dist
       # Step 4: Deploy the generated files to the 'output' branch
       - name: Deploy to Output Branch
         uses: peaceiris/actions-gh-pages@v4
