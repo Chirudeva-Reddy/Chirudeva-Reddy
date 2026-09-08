@@ -32,13 +32,10 @@
 
 ## About me
 
-I build AI systems for problems that don't cooperate. Most of that work lands in machine learning applied to health and fitness, which happens to be what I spend my own time on too.
-
-The model is usually the easy part. I spend more time on the data, the evaluation, and the ways a pipeline fails quietly, because that is what decides whether something still works a month after the demo.
-
-I lift most days. That is where the fitness half comes from, and it taught me to stop skipping the boring fundamentals, in the gym and in a codebase.
-
-Right now I am working through ML fundamentals, RAG evaluation, computer vision, and what it takes to run AI in production. I am looking for an AI engineering role.
+Hi, I'm Chirudeva! I can summarize my experience and how I got here in just a few sentences:
+1. Was lured into going down the rigourous and "prestegious" academic path that honestly didn't interest me one bit in the start.
+2. Started loving the process a year back because I enjoy solving problems that bother me PERSONALLY, and my fundamental argument is that if I can solve problems for myself, why not optimize the process and do the same for others!
+3. Finally, living and learning in the era of Artificial Intelligence has taught me one thing - In a world full of frontier models, you most certainly can build cool things by outsouring intelligence, but FORCING myself to take the extra mile to learn while building cool things is what makes this process exponentially better.
 
 ## Featured work
 
