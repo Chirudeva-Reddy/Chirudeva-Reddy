@@ -35,7 +35,7 @@
 Hi, I'm Chirudeva! I can summarize my experience and how I got here in just a few sentences:
 1. Was lured into going down the rigourous and "prestegious" academic path that honestly didn't interest me one bit in the start.
 2. Started loving the process a year back because I enjoy solving problems that bother me PERSONALLY, and my fundamental argument is that if I can solve problems for myself, why not optimize the process and do the same for others!
-3. Finally, living and learning in the era of Artificial Intelligence has taught me one thing - In a world full of frontier models, you most certainly can build cool things by outsouring intelligence, but FORCING myself to take the extra mile and learn while building cool things is what makes this process exponentially better.
+3. Finally, living and learning in the era of Artificial Intelligence has taught me one thing - In a world full of frontier models, you most certainly can build cool things by outsourcing intelligence, but FORCING myself to take the extra mile and learn while building cool things is what makes this process exponentially better.
 
 ## Featured work
 
