@@ -716,7 +716,7 @@ PROJECTS = [
     ("road-accident", "Road accident severity", "0.806", "macro F1, held-out",
      "Severity classification and crash-hotspot mapping over Chicago crash "
      "records, five model families under stratified CV.",
-     ["LightGBM", "SHAP", "DBSCAN"], False),
+     ["LightGBM", "SHAP", "DBSCAN"], True),
     ("duet", "duet", "--selftest", "proves the read-only sandbox with a canary file",
      "One bash script asks Claude Code and Codex the same question "
      "independently and leads with where they disagree.",

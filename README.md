@@ -51,7 +51,7 @@ Right now I am working through ML fundamentals, RAG evaluation, computer vision,
   <a href="https://github.com/Chirudeva-Reddy/odoo-salon-erp"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-salon-erp-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-salon-erp.svg" /><img width="410" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-salon-erp.svg" alt="Salon ERP: Odoo 19, installable module, here for the data model. Guarded booking states, an append-only loyalty ledger, and an interval constraint that blocks double-booking even under sudo." /></picture></a>
 </p>
 
-Each card opens its repository. Live demos: [ClaimLens](https://chirudeva-reddy.github.io/ClaimLens/) and [hallucination detection](https://chirudeva-reddy.github.io/NLP-Proj/).
+Each card opens its repository. Live demos: [ClaimLens](https://chirudeva-reddy.github.io/ClaimLens/), [hallucination detection](https://chirudeva-reddy.github.io/NLP-Proj/) and [road accident severity](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/).
 
 ## Tools I use
 
