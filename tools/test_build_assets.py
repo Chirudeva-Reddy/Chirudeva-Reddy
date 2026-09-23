@@ -14,6 +14,7 @@ from datetime import date, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_assets as b
 import import_hevy as ih
+import icons
 
 
 def days_from(spec, end=None):
@@ -107,10 +108,10 @@ def test_chip_text_stays_inside_its_pill():
     rounded rect the way it did when the width was estimated for a
     proportional font."""
     palette = b.THEMES["-dark"]
-    labels = [n for _, items in b.STACK for n, _ in items]
-    assert labels, "no stack labels to check"
-    for label in labels:
-        frag, w = b.chip(0, 0, label, "#fff", palette)
+    entries = [(n, s) for _, items in b.STACK for n, _, s in items]
+    assert entries, "no stack labels to check"
+    for label, slug in entries:
+        frag, w = b.chip(0, 0, label, "#fff", palette, slug)
         el = ET.fromstring("<svg xmlns='http://www.w3.org/2000/svg'>"
                            + frag.replace("xml:space", "space") + "</svg>")
         rect = next(e for e in el.iter() if e.tag.endswith("rect"))
@@ -125,7 +126,72 @@ def test_chip_text_stays_inside_its_pill():
         assert pill - (start + length) >= 6, (
             "%s: only %.1f px of right padding, too tight"
             % (label, pill - (start + length)))
-    print("chip bounds ok (%d labels)" % len(labels))
+        # The glyph sits between the left padding and the label.
+        mark = next(e for e in el.iter() if e.tag.endswith("path"))
+        assert "scale" in mark.attrib["transform"], label
+    print("chip bounds ok (%d labels)" % len(entries))
+
+
+def test_every_declared_icon_slug_exists():
+    """A slug with a typo renders nothing at all, and an empty pill looks like
+    a styling bug rather than a missing glyph. Fail the build instead."""
+    used = [s for _, items in b.STACK for _, _, s in items]
+    used += [s for _, _, _, s in b.SOCIAL]
+    missing = [s for s in used if s not in icons.ICONS]
+    assert not missing, "no vendored glyph for: %s" % missing
+    for slug in used:
+        frag = icons.glyph(slug, 0, 0, 18, "#fff")
+        assert frag, slug
+        ET.fromstring("<svg xmlns='http://www.w3.org/2000/svg'>" + frag + "</svg>")
+    assert icons.glyph("definitely-not-a-brand", 0, 0, 18, "#fff") == "", \
+        "an unknown slug must degrade to nothing, not raise"
+    print("icon slugs ok (%d glyphs)" % len(used))
+
+
+def test_dark_brand_colours_are_lifted_off_the_dark_card():
+    """Pandas (#150458), Django (#092E20) and Vercel (#000000) are close enough
+    to the dark surface to disappear. contrast() must move them, and must leave
+    an already-legible colour alone."""
+    dark, light = b.THEMES["-dark"], b.THEMES[""]
+    for sunk in ("#150458", "#092E20", "#000000"):
+        lifted = b.contrast(sunk, dark)
+        assert lifted != sunk, "%s was left unreadable on the dark card" % sunk
+        assert b.luminance(lifted) > b.luminance(dark["surface"]) + 0.15, (
+            "%s -> %s is still too close to the surface" % (sunk, lifted))
+    assert b.contrast("#FF9900", dark) == "#FF9900", "a bright brand was altered"
+    assert b.contrast("#3776AB", light) == "#3776AB", "a mid brand was altered"
+    assert b.contrast("#FFFFFF", light) != "#FFFFFF", "white must darken on light"
+    print("brand contrast ok")
+
+
+def test_stack_pills_do_not_overlap_or_leave_the_card():
+    """Pills are packed by hand and wrap on width. A row that overflows or a
+    wrap that lands on top of the previous row is invisible in code review."""
+    for suffix, palette in b.THEMES.items():
+        doc = b.build_stack(palette)
+        root = ET.fromstring(doc)
+        width = float(root.attrib["width"])
+        height = float(root.attrib["height"])
+        boxes = []
+        for e in root.iter():
+            if not e.tag.endswith("rect"):
+                continue
+            x, y = float(e.attrib["x"]), float(e.attrib["y"])
+            bw, bh = float(e.attrib["width"]), float(e.attrib["height"])
+            assert x >= 0 and x + bw <= width + 0.01, \
+                "pill runs from %.1f to %.1f in a %.0f wide card" % (x, x + bw, width)
+            assert y >= 0 and y + bh <= height + 0.01, \
+                "pill bottom %.1f falls outside a %.0f tall card" % (y + bh, height)
+            boxes.append((x, y, bw, bh))
+        for i, (ax, ay, aw, ah) in enumerate(boxes):
+            for bx, by, bw2, bh2 in boxes[i + 1:]:
+                overlap = (ax < bx + bw2 and bx < ax + aw
+                           and ay < by + bh2 and by < ay + ah)
+                assert not overlap, \
+                    "pills overlap: (%.0f,%.0f) and (%.0f,%.0f)" % (ax, ay, bx, by)
+        assert len(boxes) == sum(len(i) for _, i in b.STACK), \
+            "expected one pill per stack entry in %s" % (suffix or "light")
+    print("stack packing ok")
 
 
 def test_language_legend_stays_in_card():
@@ -183,25 +249,53 @@ def test_week_streak():
     print("week streak ok")
 
 
-def test_sparkline_stays_inside_its_box():
-    """Points are placed by hand, so a tall week must not draw above the box
-    or past its right edge."""
+def bar_rects(frag):
+    root = ET.fromstring("<svg xmlns='http://www.w3.org/2000/svg'>"
+                         + frag + "</svg>")
+    return [e for e in root.iter() if e.tag.endswith("rect")]
+
+
+def test_bars_stay_inside_their_box():
+    """Columns are placed by hand, so a tall week must not draw above the box
+    or past either edge."""
     x, y, w, h = 26, 116, 848, 62
+    palette = b.THEMES[""]
     vals = [0, 5, 200, 3, 0, 87]
-    frag = b.sparkline(x, y, w, h, vals, "#000", "#000")
-    poly = re.search(r'points="([^"]+)"', frag).group(1)
-    pts = [tuple(float(n) for n in p.split(",")) for p in poly.split(" ")]
-    assert len(pts) == len(vals)
-    for px, py in pts:
-        assert x - 0.01 <= px <= x + w + 0.01, "x out of box: %s" % px
-        assert y - 0.01 <= py <= y + h + 0.01, "y out of box: %s" % py
-    assert abs(pts[0][0] - x) < 0.01 and abs(pts[-1][0] - (x + w)) < 0.01
-    assert abs(pts[2][1] - y) < 0.01, "the peak should touch the top"
-    assert b.sparkline(x, y, w, h, [0, 0, 0], "#000", "#000") == "", \
-        "all-zero data should draw nothing rather than a flat fake line"
-    assert b.sparkline(x, y, w, h, [5], "#000", "#000") == "", \
-        "a single point cannot form a line"
-    print("sparkline bounds ok")
+    rects = bar_rects(b.bars(x, y, w, h, vals, palette))
+    assert len(rects) == len(vals), "expected one column per week"
+    for r in rects:
+        rx, ry = float(r.attrib["x"]), float(r.attrib["y"])
+        rw, rh = float(r.attrib["width"]), float(r.attrib["height"])
+        assert x - 0.01 <= rx and rx + rw <= x + w + 0.01, \
+            "column runs from %.1f to %.1f" % (rx, rx + rw)
+        assert y - 0.01 <= ry and ry + rh <= y + h + 0.01, \
+            "column runs from %.1f to %.1f vertically" % (ry, ry + rh)
+    peak = max(rects, key=lambda r: float(r.attrib["height"]))
+    assert abs(float(peak.attrib["y"]) - y) < 0.01, "the peak should touch the top"
+    assert b.bars(x, y, w, h, [0, 0, 0], palette) == "", \
+        "all-zero data should draw nothing rather than a row of fake columns"
+    assert b.bars(x, y, w, h, [], palette) == ""
+    print("bar bounds ok")
+
+
+def test_a_rest_week_does_not_flatten_the_chart():
+    """The whole point of columns over a line: trailing weeks with no session
+    must read as gaps, not drag a trace flat along the baseline."""
+    x, y, w, h = 26, 116, 848, 62
+    palette = b.THEMES[""]
+    vals = [60, 90, 120, 0, 0, 0]          # three weeks off at the end
+    rects = bar_rects(b.bars(x, y, w, h, vals, palette))
+    heights = [float(r.attrib["height"]) for r in rects]
+    trained, rested = heights[:3], heights[3:]
+    assert all(v > b.REST_STUB for v in trained), heights
+    assert all(v == b.REST_STUB for v in rested), \
+        "a rest week must be a baseline stub, not a scaled column"
+    # The trained weeks keep their full range instead of being squashed toward
+    # the baseline by the empty ones.
+    assert abs(max(trained) - h) < 0.01, "the peak lost its scale"
+    assert len({round(v, 2) for v in trained}) == 3, \
+        "distinct weeks collapsed to the same height"
+    print("rest weeks read as gaps ok")
 
 
 def test_training_card_empty_state_invents_nothing():
@@ -210,6 +304,7 @@ def test_training_card_empty_state_invents_nothing():
     assert "No sessions logged yet" in doc
     assert not re.search(r'<(polyline|circle)', doc), \
         "empty log must not draw a chart"
+    assert doc.count("<rect") == 1, "empty log must draw only the card itself"
     assert not re.search(r'font-size="26"', doc), \
         "empty log must not show headline numbers"
     print("training empty state ok")
@@ -284,9 +379,11 @@ def test_week_window_labels_follow_the_constant():
                     "found stale '%d weeks' while set to %d" % (stale, weeks)
             assert len(b.weekly_minutes([])) == weeks, \
                 "weekly_minutes ignored the constant when called bare"
-            pts = re.search(r'points="([^"]+)"', doc).group(1).split(" ")
-            assert len(pts) == weeks, "plotted %d points for a %d week window" % (
-                len(pts), weeks)
+            root = ET.fromstring(doc)
+            cols = [e for e in root.iter() if e.tag.endswith("rect")]
+            # one card background plus one column per week in the window
+            assert len(cols) == weeks + 1, \
+                "plotted %d columns for a %d week window" % (len(cols) - 1, weeks)
     finally:
         b.TRAINING_WEEKS = original
     print("week window labels ok")
@@ -319,7 +416,11 @@ if __name__ == "__main__":
     test_typing_keytimes()
     test_training_parsing_and_bucketing()
     test_week_streak()
-    test_sparkline_stays_inside_its_box()
+    test_every_declared_icon_slug_exists()
+    test_dark_brand_colours_are_lifted_off_the_dark_card()
+    test_stack_pills_do_not_overlap_or_leave_the_card()
+    test_bars_stay_inside_their_box()
+    test_a_rest_week_does_not_flatten_the_chart()
     test_training_card_empty_state_invents_nothing()
     test_hevy_import()
     test_week_window_labels_follow_the_constant()
