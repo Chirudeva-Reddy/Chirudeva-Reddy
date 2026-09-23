@@ -17,6 +17,9 @@ import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from icons import glyph                                    # noqa: E402
+
 USER = os.environ.get("PROFILE_USER", "Chirudeva-Reddy")
 OUT = os.environ.get("OUT_DIR", "dist")
 API = "https://api.github.com/graphql"
@@ -56,7 +59,7 @@ THEMES = {
 }
 
 TYPING_LINES = [
-    "AI engineer, mostly health and fitness",
+    "AI engineer, applied machine learning",
     "The model is usually the easy part",
     "I care about the eval, not just the demo",
     "Currently living in RAG evaluation and computer vision",
@@ -70,22 +73,35 @@ FOOTER_LINES = [
 ]
 
 SOCIAL = [
-    ("linkedin", "LinkedIn", "#0A66C2"),
-    ("email", "Email", "#EA4335"),
-    ("instagram", "Instagram", "#E4405F"),
+    ("linkedin", "LinkedIn", "#0A66C2", "linkedin"),
+    ("email", "Email", "#EA4335", "gmail"),
+    ("instagram", "Instagram", "#E4405F", "instagram"),
 ]
 
+# (label, brand colour, Simple Icons slug). The colour is the official brand
+# hex; contrast() lifts the few that would vanish into the card.
 STACK = [
     ("AI and machine learning",
-     [("Python", "#3776AB"), ("PyTorch", "#EE4C2C"), ("TensorFlow", "#FF6F00"),
-      ("scikit-learn", "#F7931E"), ("CUDA", "#76B900"), ("MLflow", "#0194E2")]),
+     [("Python", "#3776AB", "python"),
+      ("PyTorch", "#EE4C2C", "pytorch"),
+      ("TensorFlow", "#FF6F00", "tensorflow"),
+      ("scikit-learn", "#F7931E", "scikitlearn"),
+      ("CUDA", "#76B900", "nvidia"),
+      ("MLflow", "#0194E2", "mlflow")]),
     ("Data and applications",
-     [("NumPy", "#4D77CF"), ("Pandas", "#150458"), ("Streamlit", "#FF4B4B"),
-      ("Plotly", "#3F4F75"), ("Django", "#092E20"), ("Node.js", "#339933"),
-      ("PostgreSQL", "#4169E1"), ("MongoDB", "#47A248")]),
+     [("NumPy", "#4D77CF", "numpy"),
+      ("Pandas", "#150458", "pandas"),
+      ("Streamlit", "#FF4B4B", "streamlit"),
+      ("Plotly", "#3F4F75", "plotly"),
+      ("Django", "#092E20", "django"),
+      ("Node.js", "#339933", "nodedotjs"),
+      ("PostgreSQL", "#4169E1", "postgresql"),
+      ("MongoDB", "#47A248", "mongodb")]),
     ("Platforms",
-     [("AWS", "#FF9900"), ("Azure", "#0078D4"), ("Firebase", "#DD2C00"),
-      ("Vercel", "#888888")]),
+     [("AWS", "#FF9900", "amazonwebservices"),
+      ("Azure", "#0078D4", "microsoftazure"),
+      ("Firebase", "#DD2C00", "firebase"),
+      ("Vercel", "#000000", "vercel")]),
 ]
 
 
@@ -330,8 +346,8 @@ def build_banner(p):
             x=w / 2, ff=SANS, c=p["on_wave"]))
     body.append(
         '<text x="{x}" y="120" font-family="{ff}" font-size="15" font-weight="500" '
-        'fill="{c}" text-anchor="middle">AI Engineer &#183; Health, Fitness '
-        '&amp; Useful Systems</text>'.format(
+        'fill="{c}" text-anchor="middle">AI Engineer &#183; Applied Machine '
+        'Learning &amp; Evaluation</text>'.format(
             x=w / 2, ff=SANS, c=p["on_wave_muted"]))
     body.append(typing(TYPING_LINES, w / 2, 224, 19,
                        p["accent"], p["accent_soft"]))
@@ -345,9 +361,14 @@ def build_footer(p):
     return svg(w, h, "".join(body), "Open to AI engineering roles")
 
 
-CHIP_SIZE = 12.5
-CHIP_LEAD = 24      # dot plus the gap before the label
-CHIP_TAIL = 13      # padding after the label
+CHIP_SIZE = 14.5    # label font size
+CHIP_H = 38         # pill height
+CHIP_ICON = 19      # brand glyph box
+CHIP_PAD = 14       # left padding before the glyph
+CHIP_LEAD = CHIP_PAD + CHIP_ICON + 10   # glyph plus the gap before the label
+CHIP_TAIL = 16      # padding after the label
+CHIP_GAP = 9        # horizontal gap between pills
+CHIP_ROW = CHIP_H + 10                  # pitch of a wrapped row
 
 # ponytail: the label sets the pill width, and the font is whatever the reader
 # has installed, so a proportional guess drifts and the text spills out. Text
@@ -359,17 +380,62 @@ def chip_text_width(label):
     return len(label) * CHIP_SIZE * MONO_ADVANCE
 
 
-def chip(x, y, label, color, p):
+def rgb(hex_color):
+    """(r, g, b) from #RGB or #RRGGBB, so a shorthand colour is not a crash."""
+    h = hex_color.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    if len(h) != 6:
+        raise ValueError("not a hex colour: %r" % (hex_color,))
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def luminance(hex_color):
+    """Relative brightness, 0 (black) to 1 (white)."""
+    r, g, b = (c / 255.0 for c in rgb(hex_color))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def mix(hex_color, other, amount):
+    return "#{:02X}{:02X}{:02X}".format(
+        *(int(round(a + (b - a) * amount))
+          for a, b in zip(rgb(hex_color), rgb(other))))
+
+
+def contrast(color, p):
+    """Brand colour, lifted when it would disappear into the card.
+
+    Simple Icons ships the official hex and several of them (Pandas #150458,
+    Django #092E20, Vercel #000000) sit almost on top of the dark surface.
+    Blending toward the card keeps the hue recognisable while staying legible;
+    the light theme gets the same treatment for anything near-white.
+    """
+    dark = luminance(p["surface"]) < 0.5
+    lum = luminance(color)
+    if dark and lum < 0.24:
+        return mix(color, "#FFFFFF", 0.62)
+    if not dark and lum > 0.82:
+        return mix(color, "#000000", 0.45)
+    return color
+
+
+def chip(x, y, label, color, p, slug=None):
+    """One rounded pill: brand glyph, then the label. Returns (svg, width)."""
     tw = chip_text_width(label)
     w = CHIP_LEAD + tw + CHIP_TAIL
-    return ('<g><rect x="{x}" y="{y}" width="{w}" height="28" rx="14" '
-            'fill="{s}" stroke="{l}"/>'
-            '<circle cx="{cx}" cy="{cy}" r="4.5" fill="{c}"/>'
+    mark = glyph(slug, x + CHIP_PAD, y + (CHIP_H - CHIP_ICON) / 2.0,
+                 CHIP_ICON, contrast(color, p)) if slug else (
+        '<circle cx="{cx}" cy="{cy}" r="5.5" fill="{c}"/>'.format(
+            cx=x + CHIP_PAD + CHIP_ICON / 2.0, cy=y + CHIP_H / 2.0,
+            c=contrast(color, p)))
+    return ('<g><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" '
+            'fill="{s}" stroke="{l}"/>{mark}'
             '<text x="{tx}" y="{ty}" font-family="{ff}" font-size="{fs}" '
             'textLength="{tw}" lengthAdjust="spacing" fill="{t}" '
             'xml:space="preserve">{n}</text></g>'.format(
-                x=x, y=y, w=round(w, 2), s=p["surface"], l=p["line"], c=color,
-                cx=x + 13, cy=y + 14, tx=x + CHIP_LEAD, ty=y + 18,
+                x=x, y=y, w=round(w, 2), h=CHIP_H, r=CHIP_H / 2.0,
+                s=p["surface"], l=p["line"], mark=mark,
+                tx=x + CHIP_LEAD, ty=y + CHIP_H / 2.0 + CHIP_SIZE * 0.36,
                 ff=MONO, fs=CHIP_SIZE, tw=round(tw, 2),
                 t=p["text"], n=esc(label))), w
 
@@ -383,17 +449,17 @@ def build_stack(p):
                     'font-weight="700" letter-spacing="0.08em" fill="{c}">{t}</text>'
                     .format(x=x_pad, y=y, ff=SANS, c=p["muted"],
                             t=esc(heading.upper())))
-        y += 14
+        y += 16
         cx = x_pad
-        for label, color in items:
-            piece, cw = chip(cx, y, label, color, p)
-            if cx + cw > w - x_pad:  # wrap
+        for label, color, slug in items:
+            cw = CHIP_LEAD + chip_text_width(label) + CHIP_TAIL
+            if cx > x_pad and cx + cw > w - x_pad:      # wrap before drawing
                 cx = x_pad
-                y += 36
-                piece, cw = chip(cx, y, label, color, p)
+                y += CHIP_ROW
+            piece, cw = chip(cx, y, label, color, p, slug)
             body.append(piece)
-            cx += cw + 8
-        y += 58
+            cx += cw + CHIP_GAP
+        y += CHIP_H + 30
     return svg(w, y - 22, "".join(body), "Tools and platforms I use")
 
 
@@ -458,11 +524,11 @@ def build_activity(p, s):
     return svg(w, h, "".join(body), "GitHub activity and top languages")
 
 
-def build_social(p, label, color):
+def build_social(p, label, color, slug=None):
     """One pill per link. Each is its own file so the README can wrap it in an
     <a>; an <img>-embedded SVG cannot carry its own clickable regions."""
-    frag, w = chip(1, 1, label, color, p)
-    return svg(round(w + 2, 2), 30, frag, label)
+    frag, w = chip(1, 1, label, color, p, slug)
+    return svg(round(w + 2, 2), CHIP_H + 2, frag, label)
 
 
 TRAINING_CSV = os.environ.get("TRAINING_CSV", "data/training.csv")
@@ -531,24 +597,61 @@ def week_streak(sessions, today=None):
     return streak
 
 
-def sparkline(x, y, w, h, values, stroke, fill):
-    """Filled area plus line. Y is scaled to the peak, so the shape reads as
-    relative effort rather than implying an absolute scale."""
-    if len(values) < 2 or not any(values):
+REST_STUB = 3   # height of the marker drawn for a week with no session
+
+
+def bars(x, y, w, h, values, p):
+    """One column per week, scaled to the tallest week in the window.
+
+    ponytail: this replaced a line chart. A line has to join the weeks with no
+    session to the ones on either side, so any break in training, and every
+    unfinished week at the right-hand end, dragged the trace flat along the
+    baseline and read as broken rendering rather than as a rest week. Columns
+    have no such obligation: a rest week is simply a stub on the baseline, and
+    the gap reads as a gap.
+    """
+    if not values or not any(values):
         return ""
     peak = max(values)
-    step = w / (len(values) - 1)
-    pts = [(x + i * step, y + h - (v / peak) * h) for i, v in enumerate(values)]
-    line = " ".join("{},{}".format(round(px, 2), round(py, 2)) for px, py in pts)
-    area = ("M{},{} L".format(round(x, 2), round(y + h, 2)) + line
-            + " L{},{} Z".format(round(x + w, 2), round(y + h, 2)))
-    last_x, last_y = pts[-1]
-    return ('<path d="{a}" fill="{f}" opacity="0.18"/>'
-            '<polyline points="{l}" fill="none" stroke="{s}" stroke-width="2" '
-            'stroke-linejoin="round" stroke-linecap="round"/>'
-            '<circle cx="{cx}" cy="{cy}" r="3.5" fill="{s}"/>'.format(
-                a=area, l=line, s=stroke, f=fill,
-                cx=round(last_x, 2), cy=round(last_y, 2)))
+    slot = w / len(values)
+    bw = min(slot * 0.62, 30)
+    trained = [v for v in values if v]
+    avg = sum(trained) / len(trained)
+
+    out = []
+    # Baseline, so the rest weeks sit on something rather than float.
+    out.append('<line x1="{a}" y1="{y}" x2="{b}" y2="{y}" stroke="{c}" '
+               'stroke-width="1" opacity="0.5"/>'.format(
+                   a=round(x, 2), b=round(x + w, 2), y=round(y + h, 2),
+                   c=p["line"]))
+    # Mean of the weeks actually trained. Skipping the rest weeks keeps this a
+    # typical session week rather than a number dragged down by time off.
+    ay = y + h - (avg / peak) * h
+    out.append('<line x1="{a}" y1="{ay}" x2="{b}" y2="{ay}" stroke="{c}" '
+               'stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>'
+               '<text x="{tx}" y="{ty}" font-family="{ff}" font-size="9.5" '
+               'fill="{c}" text-anchor="end">avg {v} min</text>'.format(
+                   a=round(x, 2), b=round(x + w, 2), ay=round(ay, 2),
+                   c=p["muted"], tx=round(x + w, 2), ty=round(ay - 4, 2),
+                   ff=SANS, v=int(round(avg))))
+
+    last = max(i for i, v in enumerate(values) if v)
+    for i, v in enumerate(values):
+        bx = x + slot * i + (slot - bw) / 2.0
+        if not v:
+            out.append('<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="1.5" '
+                       'fill="{c}" opacity="0.45"/>'.format(
+                           x=round(bx, 2), y=round(y + h - REST_STUB, 2),
+                           w=round(bw, 2), h=REST_STUB, c=p["muted"]))
+            continue
+        bh = max((v / peak) * h, REST_STUB + 1)
+        out.append('<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="3" '
+                   'fill="{c}"{o}><title>{v} min</title></rect>'.format(
+                       x=round(bx, 2), y=round(y + h - bh, 2), w=round(bw, 2),
+                       h=round(bh, 2),
+                       c=p["accent"] if i == last else p["accent_soft"],
+                       o="" if i == last else ' opacity="0.78"', v=v))
+    return "".join(out)
 
 
 def build_training(p, sessions, today=None):
@@ -582,8 +685,7 @@ def build_training(p, sessions, today=None):
     for i, (value, label, hot) in enumerate(cells):
         body.append(metric(step * (i + 0.5), 78, value, label, p, accent=hot))
 
-    body.append(sparkline(26, 116, w - 52, 62, weeks,
-                          p["accent"], p["accent"]))
+    body.append(bars(26, 116, w - 52, 62, weeks, p))
     body.append('<text x="26" y="196" font-family="{ff}" font-size="10.5" '
                 'fill="{c}">{n} weeks ago</text>'
                 '<text x="{r}" y="196" font-family="{ff}" font-size="10.5" '
@@ -619,9 +721,9 @@ def main():
         write("footer{}.svg".format(suffix), build_footer(palette))
         write("stack{}.svg".format(suffix), build_stack(palette))
         write("training{}.svg".format(suffix), build_training(palette, sessions))
-        for slug, label, color in SOCIAL:
-            write("social-{}{}.svg".format(slug, suffix),
-                  build_social(palette, label, color))
+        for name, label, color, icon in SOCIAL:
+            write("social-{}{}.svg".format(name, suffix),
+                  build_social(palette, label, color, icon))
         if stats:
             write("activity{}.svg".format(suffix), build_activity(palette, stats))
     return 0
