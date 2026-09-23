@@ -42,79 +42,14 @@ Right now I am working through ML fundamentals, RAG evaluation, computer vision,
 
 ## Featured work
 
-### [ClaimLens](https://github.com/Chirudeva-Reddy/ClaimLens) &nbsp;·&nbsp; [live demo](https://chirudeva-reddy.github.io/ClaimLens/)
-
-**Two-stage vehicle damage segmentation with rule-based repair costing, and a total-loss call it is willing to refuse.**
-
-Two fine-tuned YOLOv8n-seg checkpoints run in sequence, a parts detector over 21 body panels and a damage detector over 6 collision types, and Shapely polygon intersection maps each damage mask onto the panel underneath it. Pricing is deliberately not learned: it comes from a crawled UAE collision-parts catalogue, so a wrong number is traceable to a row rather than to a weight. The loss ratio is checked against the CBUAE Unified Motor Policy 50% threshold, with US and UK presets alongside it.
-
-The part I care about most is the abstention path. When damage reaches a load-bearing unibody zone, the photo fails a blur and resolution gate, or confidence drops below the floor, the pipeline returns `INSUFFICIENT_EVIDENCE_INSPECTION_REQUIRED` instead of a price.
-
-<sub>Parts model 82.0% Box mAP@50, damage model 64.6% Box mAP@50, both from the committed checkpoint metrics. 18 pytest modules.</sub>
-
-`YOLOv8n-seg` `Ultralytics` `Shapely` `TF-IDF retrieval` `FastAPI` `Gradio`
-
----
-
-### [body2fit](https://github.com/Chirudeva-Reddy/body2health)
-
-**Waist, hip and chest girths from two orthogonal phone photos, with a 3D geometry gate that can mark a run unreportable.**
-
-YOLOv11m and SAM 2.1 segment the silhouettes and standardise them onto a fixed canvas. Twin ResNet-18 branches encode the front and side views into a shared 512-D space aligned by symmetric InfoNCE, and the fused vector feeds multi-task regression heads. The health indices are derived arithmetically from the predicted girths rather than predicted directly, so they cannot disagree with the measurements they came from.
-
-An opt-in SMPL-X fit (`--smplx_fit`) closes the loop: it fits a mesh with Neural Localizer Fields, renders it back to the camera view, and marks the run unreportable when render-back IoU and contour chamfer disagree with the silhouette actually observed.
-
-<sub>Waist MAE 2.40 cm dual-view and 1.97 cm with height, on a subject-disjoint BodyM split. Dual-view cuts single-front-view waist error by 74%. Paper listed as under submission to IJCAI 2026.</sub>
-
-`SAM 2.1` `YOLOv11m` `Siamese ResNet-18` `InfoNCE` `SMPL-X` `PyTorch` `Three.js`
-
----
-
-### [Pre-generation hallucination detection](https://github.com/Chirudeva-Reddy/NLP-Proj) &nbsp;·&nbsp; [live demo](https://chirudeva-reddy.github.io/NLP-Proj/)
-
-**Reading hallucination risk out of a 1.5B model's hidden states instead of out of its output text.**
-
-The same RAG prompt runs twice through Qwen2.5-1.5B, once with retrieved evidence and once with empty context, and four signals come off the residual stream: cosine drift between consecutive answer positions, Mahalanobis distance and PCA residual against a faithful-token manifold fit on the train split, and logit-lens KL between the two passes. They fuse by robust z-score with medians, IQRs and weights frozen from train and validation, so nothing is tuned on the test set. Bidirectional activation patching is there to check the signals are causal rather than merely correlated.
-
-<sub>AUROC 0.6511 on the RAGTruth held-out test (bootstrap CI 0.6307–0.6614) against 0.6106 for the attention-entropy baseline, so the intervals still overlap. The frozen composite transfers to HaluEval-QA within 0.006 AUROC. Cosine drift peaks two tokens before hallucination onset (p = 2.9e-5). University project, four authors.</sub>
-
-`Qwen2.5-1.5B` `Forward hooks` `Logit lens` `Activation patching` `RAGTruth` `HaluEval`
-
----
-
-### [Road accident severity prediction](https://github.com/Chirudeva-Reddy/Road-Accident-Severity-Prediction)
-
-**Severity classification and crash-hotspot mapping over Chicago traffic crash records.**
-
-LightGBM, XGBoost, ExtraTrees and two logistic-regression baselines are compared under five-fold stratified cross-validation. LightGBM and XGBoost land 0.0003 macro F1 apart, well inside the cross-validation standard deviation, which is the sort of margin worth naming rather than declaring a winner over; LightGBM is the one saved and evaluated on the held-out set. SHAP and LIME explain what it keys on.
-
-The geospatial half spatially joins crash points onto Chicago's 77 community areas and runs DBSCAN with a Haversine metric per area instead of over every point at once, which is the decision that keeps the clustering tractable at all.
-
-<sub>Macro F1 0.806 and balanced accuracy 0.799 on the held-out test set. 98 cluster centroids and a 15-page report committed. Four-person academic project.</sub>
-
-`LightGBM` `XGBoost` `SHAP` `LIME` `DBSCAN` `GeoPandas` `Plotly Dash`
-
----
-
-### [duet](https://github.com/Chirudeva-Reddy/duet)
-
-**Asks Claude Code and Codex the same question independently, then reports where they disagree.**
-
-One bash script. No API keys, no config file, no daemon: it drives the CLIs you are already signed into. Both panelists run read-only and neither sees the other, then a third pass leads with the disagreements rather than blending them into a consensus answer that hides them.
-
-`--selftest` tests the guarantee instead of the flag name. Each agent gets a scratch directory and is told to write a canary file by any means it can find, and anything that lands on disk is reported as a breach, so a renamed or weakened sandbox flag fails loudly instead of silently.
-
-`Bash` `Claude Code CLI` `Codex CLI` `Read-only sandboxing`
-
----
-
-### [Salon ERP](https://github.com/Chirudeva-Reddy/odoo-salon-erp)
-
-**An installable Odoo 19 module. No ML in it, here for the data model and the tests.**
-
-A booking state machine whose transitions are guarded methods rather than a free-form status field, and an append-only loyalty ledger whose `write()` and `unlink()` raise on any non-empty recordset, so a customer balance is the signed sum of a trail nobody can edit. Double-booking is blocked by a half-open interval constraint run with `sudo`, so the per-stylist record rule cannot hide a genuine conflict from the check. CI installs the module into a clean `odoo:19.0` container with demo data and runs the suite on every push.
-
-`Odoo 19` `PostgreSQL 16` `Odoo ORM record rules` `Docker Compose` `GitHub Actions`
+| Project | What it does | Links |
+| --- | --- | --- |
+| **ClaimLens** | Two-stage YOLOv8n-seg vehicle damage segmentation with rule-based repair costing from a crawled UAE parts catalogue, a CBUAE 50% total-loss check, and an abstention path that returns `INSUFFICIENT_EVIDENCE_INSPECTION_REQUIRED` instead of a price. 82.0% / 64.6% Box mAP@50. | [repo](https://github.com/Chirudeva-Reddy/ClaimLens) · [live](https://chirudeva-reddy.github.io/ClaimLens/) |
+| **body2fit** | Waist, hip and chest girths from two phone photos. SAM 2.1 silhouettes, twin ResNet-18 branches aligned by InfoNCE, and an opt-in SMPL-X fit that marks a run unreportable when render-back disagrees. Waist MAE 2.40 cm on a subject-disjoint BodyM split. | [repo](https://github.com/Chirudeva-Reddy/body2health) |
+| **Pre-generation hallucination detection** | Hallucination risk read out of Qwen2.5-1.5B hidden states rather than output text: cosine drift, Mahalanobis, PCA residual and logit-lens KL, fused with weights frozen from train. AUROC 0.6511 on RAGTruth held-out. | [repo](https://github.com/Chirudeva-Reddy/NLP-Proj) · [live](https://chirudeva-reddy.github.io/NLP-Proj/) |
+| **Road accident severity** | Severity classification and crash-hotspot mapping over Chicago crash records. Five model families under stratified CV, SHAP and LIME, and per-community-area DBSCAN with a Haversine metric. Macro F1 0.806 held-out. | [repo](https://github.com/Chirudeva-Reddy/Road-Accident-Severity-Prediction) |
+| **duet** | One bash script that asks Claude Code and Codex the same question independently and leads with where they disagree. `--selftest` proves the read-only sandbox with a canary file rather than trusting the flag name. | [repo](https://github.com/Chirudeva-Reddy/duet) |
+| **Salon ERP** | Installable Odoo 19 module, here for the data model: guarded booking-state transitions, an append-only loyalty ledger whose `write()`/`unlink()` raise, and a half-open interval constraint that blocks double-booking under `sudo`. | [repo](https://github.com/Chirudeva-Reddy/odoo-salon-erp) |
 
 ## Tools I use
 
