@@ -418,7 +418,9 @@ def test_assets_are_wellformed_svg():
                           ("footer", b.build_footer(palette)),
                           ("stack", b.build_stack(palette)),
                           ("activity", b.build_activity(palette, stats))) + tuple(
-                (pr[0], b.build_project(palette, pr)) for pr in b.PROJECTS):
+                (pr[0], b.build_project(palette, pr)) for pr in b.PROJECTS) + tuple(
+                (pr[0] + "-repo", b.build_repo_link(palette, pr[1]))
+                for pr in b.PROJECTS if pr[6]) + (("spacer", b.build_spacer()),):
             ET.fromstring(doc)  # raises on malformed XML
             assert doc.startswith("<svg"), name
             assert "&amp;" in doc or "&" not in doc, \

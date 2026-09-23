@@ -804,6 +804,30 @@ def build_project(p, project):
     return svg(w, h, "".join(body), "{}: {}".format(name, desc))
 
 
+REPO_H = 40
+
+
+def build_repo_link(p, name):
+    """A "repository" pill for a card that links to its live demo. It is as
+    wide as a card and pins the pill to the card's left edge, so in the README
+    each strip lines up under its own card."""
+    label = "repository \u2197"
+    lw = len(label) * TAG_SIZE * MONO_ADVANCE + 22
+    return svg(CARD_W, REPO_H,
+               '<rect x="{x}" y="6" width="{w}" height="{h}" rx="{r}" '
+               'fill="{s}" stroke="{c}" stroke-opacity="0.55"/>'.format(
+                   x=CARD_PAD, w=round(lw, 2), h=TAG_H, r=TAG_H / 2,
+                   s=p["surface"], c=p["accent"])
+               + mono_text(CARD_PAD + 11, 6 + TAG_H / 2 + TAG_SIZE * 0.36,
+                           label, TAG_SIZE, p["accent"], 600)[0],
+               "{} repository".format(name))
+
+
+def build_spacer():
+    """Fills a card's slot in a row of repo strips when that card has none."""
+    return svg(CARD_W, REPO_H, "", "")
+
+
 def write(name, content):
     path = os.path.join(OUT, name)
     with open(path, "w", encoding="utf-8") as fh:
@@ -826,6 +850,7 @@ def main():
     sessions = load_training()
     print("training sessions loaded: {}".format(len(sessions)))
 
+    write("project-spacer.svg", build_spacer())
     for suffix, palette in THEMES.items():
         write("banner{}.svg".format(suffix), build_banner(palette))
         write("footer{}.svg".format(suffix), build_footer(palette))
@@ -834,6 +859,9 @@ def main():
         for project in PROJECTS:
             write("project-{}{}.svg".format(project[0], suffix),
                   build_project(palette, project))
+            if project[6]:
+                write("project-{}-repo{}.svg".format(project[0], suffix),
+                      build_repo_link(palette, project[1]))
         for name, label, color, icon in SOCIAL:
             write("social-{}{}.svg".format(name, suffix),
                   build_social(palette, label, color, icon))
