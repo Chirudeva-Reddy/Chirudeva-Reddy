@@ -704,7 +704,7 @@ PROJECTS = [
      "Vehicle damage segmentation priced from a crawled UAE parts catalogue. "
      "When the evidence is thin it asks for an inspection instead of a price.",
      ["YOLOv8n-seg", "Shapely", "CBUAE 50% rule"], True),
-    ("body2fit", "body2fit", "2.40 cm", "waist MAE, subject-disjoint BodyM split",
+    ("body2health", "body2health", "2.40 cm", "waist MAE, subject-disjoint BodyM split",
      "Waist, hip and chest girths from two phone photos. An SMPL-X fit marks "
      "the run unreportable when render-back disagrees.",
      ["SAM 2.1", "ResNet-18", "InfoNCE", "SMPL-X"], False),
