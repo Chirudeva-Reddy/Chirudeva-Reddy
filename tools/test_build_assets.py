@@ -389,6 +389,23 @@ def test_week_window_labels_follow_the_constant():
     print("week window labels ok")
 
 
+def test_project_cards_fit():
+    """Pitch fits the card's line budget, and every tag stays inside it."""
+    for project in b.PROJECTS:
+        lines = b.textwrap.wrap(project[4], b.DESC_COLS)
+        assert len(lines) <= b.DESC_LINES, "%s pitch is %d lines" % (
+            project[0], len(lines))
+        for suffix, palette in b.THEMES.items():
+            root = ET.fromstring(b.build_project(palette, project))
+            rects = [e for e in root.iter() if e.tag.endswith("rect")]
+            tags = rects[2 + project[6]:]
+            assert len(tags) == len(project[5]), "%s dropped a tag" % project[0]
+            for r in tags:
+                right = float(r.get("x")) + float(r.get("width"))
+                assert right <= b.CARD_W - b.CARD_PAD, "%s tag overflows" % project[0]
+    print("project cards fit")
+
+
 def test_assets_are_wellformed_svg():
     """Every builder must emit parseable XML; a stray & would blank the image."""
     stats = {"total": 1126, "commits": 409, "stars": 10, "prs": 68, "issues": 3,
@@ -400,7 +417,8 @@ def test_assets_are_wellformed_svg():
         for name, doc in (("banner", b.build_banner(palette)),
                           ("footer", b.build_footer(palette)),
                           ("stack", b.build_stack(palette)),
-                          ("activity", b.build_activity(palette, stats))):
+                          ("activity", b.build_activity(palette, stats))) + tuple(
+                (pr[0], b.build_project(palette, pr)) for pr in b.PROJECTS):
             ET.fromstring(doc)  # raises on malformed XML
             assert doc.startswith("<svg"), name
             assert "&amp;" in doc or "&" not in doc, \
@@ -424,5 +442,6 @@ if __name__ == "__main__":
     test_training_card_empty_state_invents_nothing()
     test_hevy_import()
     test_week_window_labels_follow_the_constant()
+    test_project_cards_fit()
     test_assets_are_wellformed_svg()
     print("OK")

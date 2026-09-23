@@ -13,6 +13,7 @@ import csv
 import json
 import os
 import sys
+import textwrap
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta
@@ -39,6 +40,7 @@ THEMES = {
         "muted": "#59636E",
         "line": "#D1D9E0",
         "surface": "#F6F8FA",
+        "inset": "#FCFDFE",
         "wave_from": "#0F172A",
         "wave_to": "#2563EB",
         "on_wave": "#F8FAFC",
@@ -51,6 +53,7 @@ THEMES = {
         "muted": "#9198A1",
         "line": "#3D444D",
         "surface": "#151B23",
+        "inset": "#0D1117",
         "wave_from": "#0B1220",
         "wave_to": "#1D4ED8",
         "on_wave": "#F8FAFC",
@@ -694,6 +697,113 @@ def build_training(p, sessions, today=None):
     return svg(w, h, "".join(body), "Weekly training minutes")
 
 
+# (file slug, name, headline figure, what the figure is, one-liner, tags,
+# has a live demo). Figures are the ones the repos commit, not rounded up.
+PROJECTS = [
+    ("claimlens", "ClaimLens", "82.0 / 64.6", "Box mAP@50, parts / damage models",
+     "Vehicle damage segmentation priced from a crawled UAE parts catalogue. "
+     "When the evidence is thin it asks for an inspection instead of a price.",
+     ["YOLOv8n-seg", "Shapely", "CBUAE 50% rule"], True),
+    ("body2fit", "body2fit", "2.40 cm", "waist MAE, subject-disjoint BodyM split",
+     "Waist, hip and chest girths from two phone photos. An SMPL-X fit marks "
+     "the run unreportable when render-back disagrees.",
+     ["SAM 2.1", "ResNet-18", "InfoNCE", "SMPL-X"], False),
+    ("hallucination", "Hallucination detection", "0.6511",
+     "AUROC, RAGTruth held-out",
+     "Reads hallucination risk out of Qwen2.5-1.5B hidden states before any "
+     "text is generated, with fusion weights frozen from train.",
+     ["Qwen2.5", "Mahalanobis", "logit lens"], True),
+    ("road-accident", "Road accident severity", "0.806", "macro F1, held-out",
+     "Severity classification and crash-hotspot mapping over Chicago crash "
+     "records, five model families under stratified CV.",
+     ["LightGBM", "SHAP", "DBSCAN"], False),
+    ("duet", "duet", "--selftest", "proves the read-only sandbox with a canary file",
+     "One bash script asks Claude Code and Codex the same question "
+     "independently and leads with where they disagree.",
+     ["bash", "Claude Code", "Codex"], False),
+    ("salon-erp", "Salon ERP", "Odoo 19", "installable module, here for the data model",
+     "Guarded booking states, an append-only loyalty ledger, and an interval "
+     "constraint that blocks double-booking even under sudo.",
+     ["Odoo", "PostgreSQL", "Python"], False),
+]
+
+CARD_W, CARD_H = 440, 262
+CARD_PAD = 28
+DESC_SIZE = 12
+DESC_COLS = int((CARD_W - 2 * CARD_PAD) / (DESC_SIZE * MONO_ADVANCE))
+DESC_LINES = 3
+TAG_SIZE = 11
+TAG_H = 22
+
+
+def mono_text(x, y, text, size, color, weight=400):
+    """Monospace text pinned to its computed width, like the chips."""
+    tw = len(text) * size * MONO_ADVANCE
+    return ('<text x="{x}" y="{y}" font-family="{ff}" font-size="{s}" '
+            'font-weight="{wt}" textLength="{tw}" lengthAdjust="spacing" '
+            'fill="{c}" xml:space="preserve">{t}</text>'.format(
+                x=round(x, 2), y=round(y, 2), ff=MONO, s=size, wt=weight,
+                tw=round(tw, 2), c=color, t=esc(text))), tw
+
+
+def build_project(p, project):
+    """One featured-work card: a machined shell around an inset panel, the
+    headline figure in the accent, the pitch, then the tags.
+
+    Each card is its own file so the README can link it; an <img> SVG cannot
+    carry clickable regions.
+
+    ponytail: no entry animation. A CSS rise-in that starts at opacity 0 left
+    the card blank wherever the animation did not run (static renderers,
+    link previews), and a blank project card is worse than a still one.
+    """
+    _, name, figure, figure_label, desc, tags, live = project
+    w, h, x0 = CARD_W, CARD_H, CARD_PAD
+    body = [
+        '<rect x="0.5" y="0.5" width="{w}" height="{h}" rx="18" fill="{s}" '
+        'stroke="{l}"/>'.format(w=w - 1, h=h - 1, s=p["surface"], l=p["line"]),
+        '<rect x="6" y="6" width="{w}" height="{h}" rx="13" fill="{i}" '
+        'stroke="{l}" stroke-opacity="0.6"/>'.format(
+            w=w - 12, h=h - 12, i=p["inset"], l=p["line"]),
+        '<text x="{x}" y="48" font-family="{ff}" font-size="19" font-weight="700" '
+        'fill="{c}">{n}</text>'.format(x=x0, ff=SANS, c=p["text"], n=esc(name)),
+    ]
+    if live:
+        label = "live demo"
+        lw = len(label) * TAG_SIZE * MONO_ADVANCE + 22
+        lx = w - x0 - lw
+        body.append('<rect x="{x}" y="31" width="{w}" height="{h}" rx="{r}" '
+                    'fill="none" stroke="{c}" stroke-opacity="0.55"/>'.format(
+                        x=round(lx, 2), w=round(lw, 2), h=TAG_H, r=TAG_H / 2,
+                        c=p["accent"]))
+        body.append(mono_text(lx + 11, 31 + TAG_H / 2 + TAG_SIZE * 0.36,
+                              label, TAG_SIZE, p["accent"], 600)[0])
+
+    body.append('<text x="{x}" y="104" font-family="{ff}" font-size="34" '
+                'font-weight="700" letter-spacing="-0.02em" fill="{c}">{v}'
+                '</text>'.format(x=x0, ff=SANS, c=p["accent"], v=esc(figure)))
+    body.append('<text x="{x}" y="126" font-family="{ff}" font-size="12.5" '
+                'fill="{c}">{t}</text>'.format(x=x0, ff=SANS, c=p["muted"],
+                                               t=esc(figure_label)))
+
+    for i, line in enumerate(textwrap.wrap(desc, DESC_COLS)[:DESC_LINES]):
+        body.append(mono_text(x0, 162 + i * 18, line, DESC_SIZE, p["text"])[0])
+
+    tx, ty = x0, h - x0 - TAG_H + 4
+    for tag in tags:
+        tw = len(tag) * TAG_SIZE * MONO_ADVANCE
+        if tx + tw + 20 > w - x0:
+            break   # drop the tail rather than spill past the card
+        body.append('<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" '
+                    'fill="{s}" stroke="{l}"/>'.format(
+                        x=round(tx, 2), y=ty, w=round(tw + 20, 2), h=TAG_H,
+                        r=TAG_H / 2, s=p["surface"], l=p["line"]))
+        body.append(mono_text(tx + 10, ty + TAG_H / 2 + TAG_SIZE * 0.36, tag,
+                              TAG_SIZE, p["muted"])[0])
+        tx += tw + 20 + 8
+    return svg(w, h, "".join(body), "{}: {}".format(name, desc))
+
+
 def write(name, content):
     path = os.path.join(OUT, name)
     with open(path, "w", encoding="utf-8") as fh:
@@ -721,6 +831,9 @@ def main():
         write("footer{}.svg".format(suffix), build_footer(palette))
         write("stack{}.svg".format(suffix), build_stack(palette))
         write("training{}.svg".format(suffix), build_training(palette, sessions))
+        for project in PROJECTS:
+            write("project-{}{}.svg".format(project[0], suffix),
+                  build_project(palette, project))
         for name, label, color, icon in SOCIAL:
             write("social-{}{}.svg".format(name, suffix),
                   build_social(palette, label, color, icon))

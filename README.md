@@ -42,14 +42,52 @@ Right now I am working through ML fundamentals, RAG evaluation, computer vision,
 
 ## Featured work
 
-| Project | What it does | Links |
-| --- | --- | --- |
-| **ClaimLens** | Two-stage YOLOv8n-seg vehicle damage segmentation with rule-based repair costing from a crawled UAE parts catalogue, a CBUAE 50% total-loss check, and an abstention path that returns `INSUFFICIENT_EVIDENCE_INSPECTION_REQUIRED` instead of a price. 82.0% / 64.6% Box mAP@50. | [repo](https://github.com/Chirudeva-Reddy/ClaimLens) · [live](https://chirudeva-reddy.github.io/ClaimLens/) |
-| **body2fit** | Waist, hip and chest girths from two phone photos. SAM 2.1 silhouettes, twin ResNet-18 branches aligned by InfoNCE, and an opt-in SMPL-X fit that marks a run unreportable when render-back disagrees. Waist MAE 2.40 cm on a subject-disjoint BodyM split. | [repo](https://github.com/Chirudeva-Reddy/body2health) |
-| **Pre-generation hallucination detection** | Hallucination risk read out of Qwen2.5-1.5B hidden states rather than output text: cosine drift, Mahalanobis, PCA residual and logit-lens KL, fused with weights frozen from train. AUROC 0.6511 on RAGTruth held-out. | [repo](https://github.com/Chirudeva-Reddy/NLP-Proj) · [live](https://chirudeva-reddy.github.io/NLP-Proj/) |
-| **Road accident severity** | Severity classification and crash-hotspot mapping over Chicago crash records. Five model families under stratified CV, SHAP and LIME, and per-community-area DBSCAN with a Haversine metric. Macro F1 0.806 held-out. | [repo](https://github.com/Chirudeva-Reddy/Road-Accident-Severity-Prediction) |
-| **duet** | One bash script that asks Claude Code and Codex the same question independently and leads with where they disagree. `--selftest` proves the read-only sandbox with a canary file rather than trusting the flag name. | [repo](https://github.com/Chirudeva-Reddy/duet) |
-| **Salon ERP** | Installable Odoo 19 module, here for the data model: guarded booking-state transitions, an append-only loyalty ledger whose `write()`/`unlink()` raise, and a half-open interval constraint that blocks double-booking under `sudo`. | [repo](https://github.com/Chirudeva-Reddy/odoo-salon-erp) |
+<p align="center">
+  <a href="https://github.com/Chirudeva-Reddy/ClaimLens">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-claimlens-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-claimlens.svg" />
+      <img width="49%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-claimlens.svg" alt="ClaimLens: 82.0 / 64.6, Box mAP@50, parts / damage models. Vehicle damage segmentation priced from a crawled UAE parts catalogue. When the evidence is thin it asks for an inspection instead of a price." />
+    </picture>
+  </a>
+  <a href="https://github.com/Chirudeva-Reddy/body2health">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-body2fit-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-body2fit.svg" />
+      <img width="49%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-body2fit.svg" alt="body2fit: 2.40 cm, waist MAE, subject-disjoint BodyM split. Waist, hip and chest girths from two phone photos. An SMPL-X fit marks the run unreportable when render-back disagrees." />
+    </picture>
+  </a>
+  <a href="https://github.com/Chirudeva-Reddy/NLP-Proj">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-hallucination-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-hallucination.svg" />
+      <img width="49%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-hallucination.svg" alt="Pre-generation hallucination detection: 0.6511, AUROC, RAGTruth held-out. Reads hallucination risk out of Qwen2.5-1.5B hidden states before any text is generated, with fusion weights frozen from train." />
+    </picture>
+  </a>
+  <a href="https://github.com/Chirudeva-Reddy/Road-Accident-Severity-Prediction">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-road-accident-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-road-accident.svg" />
+      <img width="49%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-road-accident.svg" alt="Road accident severity: 0.806, macro F1, held-out. Severity classification and crash-hotspot mapping over Chicago crash records, five model families under stratified CV." />
+    </picture>
+  </a>
+  <a href="https://github.com/Chirudeva-Reddy/duet">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-duet-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-duet.svg" />
+      <img width="49%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-duet.svg" alt="duet: --selftest, proves the read-only sandbox with a canary file. One bash script asks Claude Code and Codex the same question independently and leads with where they disagree." />
+    </picture>
+  </a>
+  <a href="https://github.com/Chirudeva-Reddy/odoo-salon-erp">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-salon-erp-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-salon-erp.svg" />
+      <img width="49%" src="https://raw.githubusercontent.com/Chirudeva-Reddy/Chirudeva-Reddy/output/project-salon-erp.svg" alt="Salon ERP: Odoo 19, installable module, here for the data model. Guarded booking states, an append-only loyalty ledger, and an interval constraint that blocks double-booking even under sudo." />
+    </picture>
+  </a>
+</p>
+
+Each card opens its repository. Live demos: [ClaimLens](https://chirudeva-reddy.github.io/ClaimLens/) and [hallucination detection](https://chirudeva-reddy.github.io/NLP-Proj/).
 
 ## Tools I use
 
