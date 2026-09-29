@@ -717,6 +717,11 @@ PROJECTS = [
      "Severity classification and crash-hotspot mapping over Chicago crash "
      "records, five model families under stratified CV.",
      ["LightGBM", "SHAP", "DBSCAN"], True),
+    ("crash-hotspots", "Chicago crash hotspots", "0 of 12",
+     "Gi* hot spots among DBSCAN's 20 busiest clusters",
+     "Getis-Ord Gi* on severity-weighted crash clusters against DBSCAN "
+     "volume, with ArcGIS drive times to Level-1 trauma centers.",
+     ["ArcGIS", "Getis-Ord Gi*", "DBSCAN"], True),
     ("duet", "duet", "--selftest", "proves the read-only sandbox with a canary file",
      "One bash script asks Claude Code and Codex the same question "
      "independently and leads with where they disagree.",
